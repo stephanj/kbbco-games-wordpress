@@ -6,21 +6,33 @@ class KBBCOGames {
         this.currentWeek = this.getCurrentWeek();
         this.displayWeek = this.currentWeek;
         this.gamesData = {};
+        this.filteredTeams = new Set();
+        this.availableTeams = new Set();
+        this.filterExpanded = false;
         this.monthNames = [
             "januari", "februari", "maart", "april", "mei", "juni",
             "juli", "augustus", "september", "oktober", "november", "december"
         ];
         
+        this.loadFilterPreferences();
         this.init();
     }
     
     init() {
         // Load games data when DOM is ready
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.loadGames());
+            document.addEventListener('DOMContentLoaded', () => {
+                this.loadGames();
+                this.setupCalendarDropdownHandlers();
+            });
         } else {
             this.loadGames();
+            this.setupCalendarDropdownHandlers();
         }
+    }
+    
+    setupCalendarDropdownHandlers() {
+        // No longer needed since we use hover instead of click
     }
     
     getCurrentWeek() {
@@ -107,6 +119,11 @@ class KBBCOGames {
             return;
         }
         
+        // Initialize team filter if not done yet
+        if (this.availableTeams.size === 0) {
+            this.initializeTeamFilter();
+        }
+        
         // Create week containers
         Object.keys(this.gamesData).forEach(weekNum => {
             const weekDiv = document.createElement('div');
@@ -123,14 +140,26 @@ class KBBCOGames {
                     </div>
                 `;
             } else {
-                // Group games by date
-                const gamesByDate = this.groupGamesByDate(games);
+                // Filter games based on selected teams
+                const filteredGames = games.filter(game => this.shouldShowGame(game));
                 
-                Object.keys(gamesByDate).forEach(date => {
-                    const dayGames = gamesByDate[date];
-                    const gameCard = this.createGameCard(date, dayGames);
-                    weekDiv.appendChild(gameCard);
-                });
+                if (filteredGames.length === 0) {
+                    weekDiv.innerHTML = `
+                        <div class="no-games-message">
+                            <h3>Geen wedstrijden voor geselecteerde teams</h3>
+                            <p>Er zijn geen wedstrijden voor de geselecteerde teams deze week.</p>
+                        </div>
+                    `;
+                } else {
+                    // Group filtered games by date
+                    const gamesByDate = this.groupGamesByDate(filteredGames);
+                    
+                    Object.keys(gamesByDate).forEach(date => {
+                        const dayGames = gamesByDate[date];
+                        const gameCard = this.createGameCard(date, dayGames);
+                        weekDiv.appendChild(gameCard);
+                    });
+                }
             }
             
             container.appendChild(weekDiv);
@@ -166,6 +195,10 @@ class KBBCOGames {
         
         const dateHeader = document.createElement('div');
         dateHeader.className = 'game-date-header';
+        
+        // Check if any game in this group can be added to calendar
+        const hasUpcomingGame = games.some(game => !game.has_result);
+        
         dateHeader.innerHTML = `
             <span>${this.escapeHtml(dateTime)}</span>
             ${hasCupGame ? `<span class="competition-badge">${this.escapeHtml(competition)}</span>` : ''}
@@ -235,9 +268,32 @@ class KBBCOGames {
         // Create VS section
         const vsSection = document.createElement('div');
         vsSection.className = 'vs-section';
-        vsSection.innerHTML = `
+        
+        // Generate calendar URLs for upcoming games
+        const calendarUrls = this.generateCalendarUrls(game);
+        const isClickable = calendarUrls !== null;
+        
+        // Create VS divider with optional calendar functionality
+        const vsDividerContent = calendarUrls ? `
+            <div class="vs-divider ${isClickable ? 'clickable' : ''}" title="Voeg toe aan kalender">
+                VS
+            </div>
+        ` : `
             <div class="vs-divider">VS</div>
+        `;
+        
+        const calendarDropdown = calendarUrls ? `
+            <div class="calendar-dropdown">
+                <a href="${calendarUrls.google}" target="_blank" rel="noopener">Google Calendar</a>
+                <a href="${calendarUrls.outlook}" target="_blank" rel="noopener">Outlook</a>
+                <a href="${calendarUrls.ical}" download="kbbco-game.ics">Apple Calendar</a>
+            </div>
+        ` : '';
+        
+        vsSection.innerHTML = `
+            ${vsDividerContent}
             <div class="game-status">${game.has_result ? 'Gespeeld' : 'Te spelen'}</div>
+            ${calendarDropdown}
         `;
         
         // Create away team section
@@ -412,6 +468,237 @@ class KBBCOGames {
         div.textContent = text;
         return div.innerHTML;
     }
+    
+    // Generate calendar URLs for individual games
+    generateCalendarUrls(game) {
+        if (!game.date || !game.time || game.has_result) {
+            return null; // Don't show calendar for completed games or games without date/time
+        }
+        
+        // Parse date and time
+        const dateParts = game.date.match(/(\d{1,2}) (\w+)/);
+        if (!dateParts) return null;
+        
+        const day = parseInt(dateParts[1]);
+        const monthName = dateParts[2].toLowerCase();
+        const monthIndex = this.monthNames.indexOf(monthName);
+        if (monthIndex === -1) return null;
+        
+        // Create date object (assume current year)
+        const gameDate = new Date(new Date().getFullYear(), monthIndex, day);
+        
+        // Parse time (format: "20.00")
+        const timeParts = game.time.match(/(\d{1,2})\.(\d{2})/);
+        if (!timeParts) return null;
+        
+        const hours = parseInt(timeParts[1]);
+        const minutes = parseInt(timeParts[2]);
+        
+        gameDate.setHours(hours, minutes, 0, 0);
+        
+        // End time (assume 2 hour duration for basketball)
+        const endDate = new Date(gameDate.getTime() + (2 * 60 * 60 * 1000));
+        
+        // Format for calendar URLs
+        const formatDateForCalendar = (date) => {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        };
+        
+        const startTime = formatDateForCalendar(gameDate);
+        const endTime = formatDateForCalendar(endDate);
+        
+        // Event details
+        const homeTeam = game.is_home ? 'KBBCO Oostkamp' : game.opponent;
+        const awayTeam = game.is_home ? game.opponent : 'KBBCO Oostkamp';
+        const title = `${homeTeam} vs ${awayTeam}`;
+        const details = game.team_info ? `KBBCO ${game.team_info.display} team` : 'KBBCO Oostkamp basketball game';
+        const location = game.is_home ? 'Sporthal KBBCO, Oostkamp' : '';
+        
+        // Generate URLs
+        const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startTime}/${endTime}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+        
+        const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&startdt=${startTime}&enddt=${endTime}&body=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+        
+        // iCal format for Apple Calendar and other apps
+        const icalContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:KBBCO Games
+BEGIN:VEVENT
+UID:kbbco-${game.date.replace(/\s/g, '')}-${game.time.replace('.', '')}-${Date.now()}
+DTSTART:${startTime}
+DTEND:${endTime}
+SUMMARY:${title}
+DESCRIPTION:${details}
+LOCATION:${location}
+END:VEVENT
+END:VCALENDAR`;
+        
+        const icalUrl = `data:text/calendar;charset=utf8,${encodeURIComponent(icalContent)}`;
+        
+        return {
+            google: googleUrl,
+            outlook: outlookUrl,
+            ical: icalUrl
+        };
+    }
+    
+    // Team filter functionality
+    loadFilterPreferences() {
+        const saved = localStorage.getItem('kbbco_team_filter');
+        if (saved) {
+            try {
+                const teams = JSON.parse(saved);
+                this.filteredTeams = new Set(teams);
+            } catch (e) {
+                console.warn('Failed to load filter preferences');
+            }
+        }
+    }
+    
+    saveFilterPreferences() {
+        localStorage.setItem('kbbco_team_filter', JSON.stringify([...this.filteredTeams]));
+    }
+    
+    toggleFilter() {
+        this.filterExpanded = !this.filterExpanded;
+        const content = document.getElementById('team-filter-content');
+        const arrow = document.querySelector('.filter-arrow');
+        
+        if (this.filterExpanded) {
+            content.style.display = 'block';
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            content.style.display = 'none';
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+    
+    initializeTeamFilter() {
+        // Collect all unique teams from games data
+        this.availableTeams.clear();
+        Object.values(this.gamesData).forEach(weekGames => {
+            weekGames.forEach(game => {
+                if (game.team_info && game.team_info.display) {
+                    this.availableTeams.add(game.team_info.display);
+                }
+            });
+        });
+        
+        // If no teams are filtered, show all teams
+        if (this.filteredTeams.size === 0) {
+            this.filteredTeams = new Set(this.availableTeams);
+        }
+        
+        this.renderTeamCheckboxes();
+        this.updateFilterCount();
+    }
+    
+    renderTeamCheckboxes() {
+        const container = document.getElementById('team-checkboxes');
+        if (!container) return;
+        
+        // Sort teams: seniors first, then youth by age descending
+        const teams = [...this.availableTeams].sort((a, b) => {
+            const aIsSenior = a.includes('ONE') || a.includes('TWO') || a.includes('THREE');
+            const bIsSenior = b.includes('ONE') || b.includes('TWO') || b.includes('THREE');
+            
+            if (aIsSenior && !bIsSenior) return -1;
+            if (!aIsSenior && bIsSenior) return 1;
+            
+            // Both senior or both youth, sort alphabetically
+            return a.localeCompare(b);
+        });
+        
+        container.innerHTML = teams.map(team => {
+            const levelClass = this.getTeamLevelClass(team);
+            const isChecked = this.filteredTeams.has(team);
+            
+            return `
+                <label class="team-checkbox ${levelClass}">
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} 
+                           onchange="kbbcoGames.toggleTeam('${team}')">
+                    <span class="checkbox-custom"></span>
+                    <span class="team-label">${team}</span>
+                </label>
+            `;
+        }).join('');
+    }
+    
+    toggleTeam(team) {
+        if (this.filteredTeams.has(team)) {
+            this.filteredTeams.delete(team);
+        } else {
+            this.filteredTeams.add(team);
+        }
+        
+        this.saveFilterPreferences();
+        this.updateFilterCount();
+        this.renderGames();
+    }
+    
+    selectAllTeams() {
+        this.filteredTeams = new Set(this.availableTeams);
+        this.renderTeamCheckboxes();
+        this.updateFilterCount();
+        this.saveFilterPreferences();
+        this.renderGames();
+    }
+    
+    selectSeniorTeams() {
+        this.filteredTeams.clear();
+        this.availableTeams.forEach(team => {
+            if (team.includes('ONE') || team.includes('TWO') || team.includes('THREE')) {
+                this.filteredTeams.add(team);
+            }
+        });
+        this.renderTeamCheckboxes();
+        this.updateFilterCount();
+        this.saveFilterPreferences();
+        this.renderGames();
+    }
+    
+    selectYouthTeams() {
+        this.filteredTeams.clear();
+        this.availableTeams.forEach(team => {
+            if (!team.includes('ONE') && !team.includes('TWO') && !team.includes('THREE')) {
+                this.filteredTeams.add(team);
+            }
+        });
+        this.renderTeamCheckboxes();
+        this.updateFilterCount();
+        this.saveFilterPreferences();
+        this.renderGames();
+    }
+    
+    clearAllTeams() {
+        this.filteredTeams.clear();
+        this.renderTeamCheckboxes();
+        this.updateFilterCount();
+        this.saveFilterPreferences();
+        this.renderGames();
+    }
+    
+    updateFilterCount() {
+        const countElement = document.querySelector('.filter-count');
+        if (!countElement) return;
+        
+        const total = this.availableTeams.size;
+        const selected = this.filteredTeams.size;
+        
+        if (selected === 0) {
+            countElement.textContent = 'Geen teams';
+        } else if (selected === total) {
+            countElement.textContent = 'Alle teams';
+        } else {
+            countElement.textContent = `${selected}/${total} teams`;
+        }
+    }
+    
+    shouldShowGame(game) {
+        if (this.filteredTeams.size === 0) return false;
+        if (!game.team_info || !game.team_info.display) return true;
+        return this.filteredTeams.has(game.team_info.display);
+    }
 }
 
 // Initialize when document is ready
@@ -443,6 +730,48 @@ window.kbbcoGames = {
     loadGames: function() {
         if (kbbcoGames) {
             kbbcoGames.loadGames();
+        } else {
+            console.warn('KBBCO Games: Not initialized');
+        }
+    },
+    toggleFilter: function() {
+        if (kbbcoGames) {
+            kbbcoGames.toggleFilter();
+        } else {
+            console.warn('KBBCO Games: Not initialized');
+        }
+    },
+    toggleTeam: function(team) {
+        if (kbbcoGames) {
+            kbbcoGames.toggleTeam(team);
+        } else {
+            console.warn('KBBCO Games: Not initialized');
+        }
+    },
+    selectAllTeams: function() {
+        if (kbbcoGames) {
+            kbbcoGames.selectAllTeams();
+        } else {
+            console.warn('KBBCO Games: Not initialized');
+        }
+    },
+    selectSeniorTeams: function() {
+        if (kbbcoGames) {
+            kbbcoGames.selectSeniorTeams();
+        } else {
+            console.warn('KBBCO Games: Not initialized');
+        }
+    },
+    selectYouthTeams: function() {
+        if (kbbcoGames) {
+            kbbcoGames.selectYouthTeams();
+        } else {
+            console.warn('KBBCO Games: Not initialized');
+        }
+    },
+    clearAllTeams: function() {
+        if (kbbcoGames) {
+            kbbcoGames.clearAllTeams();
         } else {
             console.warn('KBBCO Games: Not initialized');
         }

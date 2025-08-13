@@ -117,7 +117,7 @@
     background: white;
     border-radius: 16px;
     margin-bottom: 20px;
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -426,6 +426,70 @@
     font-weight: 500;
 }
 
+/* Clickable VS divider for calendar */
+.vs-divider.clickable {
+    cursor: pointer;
+    position: relative;
+}
+
+.vs-section {
+    position: relative;
+    overflow: visible;
+}
+
+.vs-section:hover .calendar-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.game-content {
+    overflow: visible;
+}
+
+.calendar-dropdown {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 140px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: visible;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.calendar-dropdown a {
+    display: block;
+    padding: 8px 12px;
+    color: #2c3e50;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.calendar-dropdown a:hover {
+    background: #f8f9fa;
+    color: #e74c3c;
+}
+
+.calendar-dropdown a:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.calendar-dropdown a:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
 /* Loading and Error States */
 .loading-spinner {
     display: flex;
@@ -507,6 +571,220 @@
     margin: 24px 0;
     border: none;
     border-top: 1px solid #ecf0f1;
+}
+
+/* Calendar instruction between header and games */
+.calendar-instruction-container {
+    background: #f8fafc;
+    padding: 12px 24px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.calendar-instruction {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Team Filter Footer */
+.team-filter-footer {
+    background: #f8fafc;
+    border-top: 1px solid #ecf0f1;
+    padding: 0;
+}
+
+.filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.filter-header:hover {
+    background: #eef2f7;
+}
+
+.filter-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-toggle {
+    background: none;
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.filter-toggle:hover {
+    background: #e74c3c;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+}
+
+.filter-arrow {
+    transition: transform 0.3s ease;
+}
+
+.filter-content {
+    display: none;
+    padding: 0 24px 20px 24px;
+    background: white;
+    border-top: 1px solid #ecf0f1;
+    animation: filterSlideDown 0.3s ease;
+}
+
+@keyframes filterSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filter-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.filter-action-btn {
+    background: linear-gradient(135deg, #ecf0f1, #d5dbdb);
+    border: 1px solid #bdc3c7;
+    color: #2c3e50;
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-action-btn:hover {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border-color: #c0392b;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
+}
+
+.team-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.team-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid #ecf0f1;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.team-checkbox:hover {
+    border-color: #e74c3c;
+    background: #fdf2f2;
+    transform: translateY(-1px);
+}
+
+.team-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #bdc3c7;
+    border-radius: 4px;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.team-checkbox input[type="checkbox"]:checked + .checkbox-custom {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    border-color: #c0392b;
+}
+
+.team-checkbox input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.team-label {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+/* Team level colors for checkboxes */
+.team-checkbox.seniors {
+    border-left: 4px solid #e74c3c;
+}
+
+.team-checkbox.u21 {
+    border-left: 4px solid #9b59b6;
+}
+
+.team-checkbox.u18 {
+    border-left: 4px solid #e67e22;
+}
+
+.team-checkbox.u16 {
+    border-left: 4px solid #f39c12;
+}
+
+.team-checkbox.u14 {
+    border-left: 4px solid #2ecc71;
+}
+
+.team-checkbox.u12 {
+    border-left: 4px solid #3498db;
+}
+
+.team-checkbox.u10 {
+    border-left: 4px solid #1abc9c;
+}
+
+.team-checkbox.u8 {
+    border-left: 4px solid #34495e;
 }
 
 

@@ -3,7 +3,7 @@
  * Plugin Name: KBBCO Basketball Games
  * Plugin URI: https://kbbco.be
  * Description: Display basketball games and scores for KBBCO teams with a modern, responsive interface
- * Version: 1.3.1
+ * Version: 2.0.0
  * Author: Stephan Janssen
  * License: GPL v2 or later
  * Text Domain: kbbco-games
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 class KBBCOGamesPlugin {
     
     private $api_url = 'https://vblcb.wisseq.eu/VBLCB_WebService/data/OrgMatchesByGuid?issguid=BVBL1075';
-    private $version = '1.3.1';
+    private $version = '2.0.0';
     
     public function __construct() {
         add_action('init', array($this, 'init'));
@@ -89,6 +89,10 @@ class KBBCOGamesPlugin {
                 <h3 id="week-title" class="week-title">Wedstrijden van deze week</h3>
             </div>
             
+            <div class="calendar-instruction-container">
+                <p class="calendar-instruction">Klik op (VS) om wedstrijd toe te voegen aan kalender</p>
+            </div>
+            
             <div id="games-content" class="games-content">
                 <div class="loading-spinner">
                     <div class="spinner"></div>
@@ -99,6 +103,29 @@ class KBBCOGamesPlugin {
             <div id="error-message" class="error-message" style="display: none;">
                 <p>Er is een fout opgetreden bij het laden van de wedstrijden.</p>
                 <button onclick="kbbcoGames.loadGames()" class="retry-btn">Opnieuw proberen</button>
+            </div>
+            
+            <div class="team-filter-footer">
+                <div class="filter-header">
+                    <h4>🔍 Filter Teams</h4>
+                    <button class="filter-toggle" onclick="kbbcoGames.toggleFilter()">
+                        <span class="filter-count">Alle teams</span>
+                        <svg class="filter-arrow" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="filter-content" id="team-filter-content">
+                    <div class="filter-actions">
+                        <button class="filter-action-btn" onclick="kbbcoGames.selectAllTeams()">Alles</button>
+                        <button class="filter-action-btn" onclick="kbbcoGames.selectSeniorTeams()">Seniors</button>
+                        <button class="filter-action-btn" onclick="kbbcoGames.selectYouthTeams()">Jeugd</button>
+                        <button class="filter-action-btn" onclick="kbbcoGames.clearAllTeams()">Geen</button>
+                    </div>
+                    <div class="team-checkboxes" id="team-checkboxes">
+                        <!-- Teams will be populated by JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
         <?php
