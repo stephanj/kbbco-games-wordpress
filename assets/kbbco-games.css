@@ -178,14 +178,23 @@
     text-align: left;
 }
 
-/* KBBC team is always left-aligned for consistency */
-.team-section.kbbc-team {
+/* KBBC team alignment depends on home/away status */
+.team-section.kbbc-team.away {
     align-items: flex-start !important;
     text-align: left !important;
 }
 
-.team-section.kbbc-team .team-name {
+.team-section.kbbc-team.away .team-name {
     justify-content: flex-start !important;
+}
+
+.team-section.kbbc-team.home {
+    align-items: flex-end !important;
+    text-align: right !important;
+}
+
+.team-section.kbbc-team.home .team-name {
+    justify-content: flex-end !important;
 }
 
 .team-level {
@@ -250,7 +259,7 @@
     align-items: center;
     justify-content: inherit;
     gap: 8px;
-    min-height: 2rem;
+    min-height: 3.5rem;
     line-height: 1.3;
 }
 
@@ -330,6 +339,55 @@
     min-height: 3rem;
 }
 
+/* KBBC home team scores should be right-aligned */
+.team-section.kbbc-team.home .team-score {
+    justify-content: flex-end !important;
+}
+
+/* KBBC winner styling */
+.team-section.kbbc-winner {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.12), rgba(255, 255, 255, 0.95));
+    border-radius: 12px;
+    padding: 16px;
+    margin: -8px;
+    position: relative;
+}
+
+.team-section.kbbc-winner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.team-section.kbbc-winner.home::before {
+    right: 0;
+}
+
+.team-section.kbbc-winner.away::before {
+    left: 0;
+}
+
+.team-section.kbbc-winner .team-score {
+    color: #c0392b;
+    text-shadow: 0 1px 3px rgba(231, 76, 60, 0.2);
+    font-weight: 900;
+    animation: victoryPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes victoryPulse {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.02);
+    }
+}
+
 .vs-section {
     display: flex;
     flex-direction: column;
@@ -352,6 +410,14 @@
     font-size: 1.1rem;
     margin-bottom: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    cursor: pointer;
+}
+
+.vs-divider:hover {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    transform: rotate(360deg) scale(1.15);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
 }
 
 .game-status {

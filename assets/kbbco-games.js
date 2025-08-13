@@ -202,9 +202,15 @@ class KBBCOGames {
         // Team level class for styling
         const levelClass = this.getTeamLevelClass(game.team_info.display);
         
+        // Determine if KBBC won
+        const kbbcWon = game.has_result && (
+            (game.is_home && parseInt(homeScore) > parseInt(awayScore)) ||
+            (!game.is_home && parseInt(awayScore) > parseInt(homeScore))
+        );
+        
         // Create home team section
         const homeSection = document.createElement('div');
-        homeSection.className = `team-section home ${game.is_home ? 'kbbc-team' : ''}`;
+        homeSection.className = `team-section home ${game.is_home ? 'kbbc-team' : ''} ${game.is_home && kbbcWon ? 'kbbc-winner' : ''}`;
         
         let homeSectionHTML = `
             <div class="team-name">
@@ -236,7 +242,7 @@ class KBBCOGames {
         
         // Create away team section
         const awaySection = document.createElement('div');
-        awaySection.className = `team-section away ${!game.is_home ? 'kbbc-team' : ''}`;
+        awaySection.className = `team-section away ${!game.is_home ? 'kbbc-team' : ''} ${!game.is_home && kbbcWon ? 'kbbc-winner' : ''}`;
         
         let awaySectionHTML = `
             <div class="team-name">
