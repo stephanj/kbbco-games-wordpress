@@ -1,0 +1,33 @@
+{
+  "name": "kbbco-games-plugin",
+  "version": "1.0.0",
+  "description": "WordPress plugin for displaying KBBCO basketball games and scores",
+  "scripts": {
+    "build": "./build.sh build",
+    "build:dev": "./build.sh build-dev",
+    "clean": "./build.sh clean",
+    "version": "./build.sh version",
+    "test": "./build.sh test",
+    "release": "./build.sh release",
+    "help": "./build.sh help"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "basketball",
+    "sports",
+    "kbbco"
+  ],
+  "author": "KBBCO Development Team",
+  "license": "GPL-2.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kbbco/games-plugin"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "archiver": "^5.3.1"
+  }
+}

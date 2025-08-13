@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBBCO Games - Plugin Test</title>
+    <link rel="stylesheet" href="assets/kbbco-games.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body style="margin: 20px; background: #f5f5f5; font-family: 'Segoe UI', sans-serif;">
+    <h1>KBBCO Games Plugin - Test Page</h1>
+    <p>This page demonstrates how the plugin would look when embedded in WordPress.</p>
+    
+    <!-- This is what the shortcode [kbbco_games] would output -->
+    <div id="kbbco-games-container" class="kbbco-games-widget" data-theme="default">
+        <div class="kbbco-games-header">
+            <div class="week-navigation">
+                <button class="nav-btn prev-btn" onclick="testNav('prev')" aria-label="Vorige week">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                    </svg>
+                </button>
+                <button class="nav-btn next-btn" onclick="testNav('next')" aria-label="Volgende week">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                    </svg>
+                </button>
+            </div>
+            <h3 id="week-title" class="week-title">Wedstrijden van deze week</h3>
+        </div>
+        
+        <div id="games-content" class="games-content">
+            <!-- Sample game cards for demonstration -->
+            <div class="week-games active" id="week-33">
+                
+                <!-- Game Card 1 -->
+                <div class="game-card">
+                    <div class="game-date-header">
+                        <span>Zaterdag 16 augustus om 14.00</span>
+                    </div>
+                    <div class="game-content">
+                        <div class="team-matchup">
+                            <div class="team-section home">
+                                <div class="team-level u16">
+                                    <a href="https://kbbco.be/ploegen/u16-miniemen/a">U16 A</a>
+                                </div>
+                                <div class="team-name">
+                                    <a href="https://kbbco.be/ploegen/u16-miniemen/a">KBBC Oostkamp</a>
+                                </div>
+                            </div>
+                            <div class="vs-section">
+                                <div class="vs-divider">VS</div>
+                                <div class="game-status">Te spelen</div>
+                            </div>
+                            <div class="team-section away">
+                                <div class="team-name">
+                                    <a href="#" target="_blank" rel="noopener">Bobcat Wielsbeke</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card 2 - With Score -->
+                <div class="game-card">
+                    <div class="game-date-header">
+                        <span>Zaterdag 16 augustus om 18.00</span>
+                    </div>
+                    <div class="game-content">
+                        <div class="team-matchup">
+                            <div class="team-section home">
+                                <div class="team-name">
+                                    <a href="#" target="_blank" rel="noopener">KBGC Racing Brugge</a>
+                                </div>
+                                <div class="team-score">72</div>
+                            </div>
+                            <div class="vs-section">
+                                <div class="vs-divider">VS</div>
+                                <div class="game-status">Gespeeld</div>
+                            </div>
+                            <div class="team-section away">
+                                <div class="team-level seniors">
+                                    <a href="https://kbbco.be/ploegen/seniors/three">THREE</a>
+                                </div>
+                                <div class="team-name">
+                                    <a href="https://kbbco.be/ploegen/seniors/three">KBBC Oostkamp</a>
+                                </div>
+                                <div class="team-score">68</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card 3 - Cup Game -->
+                <div class="game-card">
+                    <div class="game-date-header">
+                        <span>Zaterdag 16 augustus om 20.30</span>
+                        <span class="competition-badge">Beker van België Heren Poule D</span>
+                    </div>
+                    <div class="game-content">
+                        <div class="team-matchup">
+                            <div class="team-section home">
+                                <div class="team-level seniors">
+                                    <a href="https://kbbco.be/ploegen/seniors/one">ONE</a>
+                                </div>
+                                <div class="team-name">
+                                    <a href="https://kbbco.be/ploegen/seniors/one">KBBC Oostkamp</a>
+                                </div>
+                            </div>
+                            <div class="vs-section">
+                                <div class="vs-divider">VS</div>
+                                <div class="game-status">Te spelen</div>
+                            </div>
+                            <div class="team-section away">
+                                <div class="team-name">
+                                    <a href="#" target="_blank" rel="noopener">Guco Lier</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Card 4 - Multiple teams same time -->
+                <div class="game-card">
+                    <div class="game-date-header">
+                        <span>Zondag 17 augustus om 10.00</span>
+                    </div>
+                    <div class="game-content">
+                        <!-- First game -->
+                        <div class="team-matchup">
+                            <div class="team-section home">
+                                <div class="team-level u12">
+                                    <a href="https://kbbco.be/ploegen/u12-benjamins/a">U12 A</a>
+                                </div>
+                                <div class="team-name">
+                                    <a href="https://kbbco.be/ploegen/u12-benjamins/a">KBBC Oostkamp</a>
+                                </div>
+                            </div>
+                            <div class="vs-section">
+                                <div class="vs-divider">VS</div>
+                                <div class="game-status">Te spelen</div>
+                            </div>
+                            <div class="team-section away">
+                                <div class="team-name">
+                                    <a href="#" target="_blank" rel="noopener">BC Oostende</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="game-divider">
+                        
+                        <!-- Second game same time -->
+                        <div class="team-matchup">
+                            <div class="team-section home">
+                                <div class="team-level u10">
+                                    <a href="https://kbbco.be/ploegen/u10-microben/a">U10 A</a>
+                                </div>
+                                <div class="team-name">
+                                    <a href="https://kbbco.be/ploegen/u10-microben/a">KBBC Oostkamp</a>
+                                </div>
+                            </div>
+                            <div class="vs-section">
+                                <div class="vs-divider">VS</div>
+                                <div class="game-status">Te spelen</div>
+                            </div>
+                            <div class="team-section away">
+                                <div class="team-name">
+                                    <a href="#" target="_blank" rel="noopener">Basket Lummen</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Loading state example (hidden by default) -->
+            <div class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Wedstrijden laden...</p>
+            </div>
+        </div>
+        
+        <div id="error-message" class="error-message" style="display: none;">
+            <p>Er is een fout opgetreden bij het laden van de wedstrijden.</p>
+            <button onclick="testReload()" class="retry-btn">Opnieuw proberen</button>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: white; border-radius: 8px;">
+        <h2>Plugin Information</h2>
+        <p><strong>Plugin Name:</strong> KBBCO Basketball Games</p>
+        <p><strong>Version:</strong> 1.0.0</p>
+        <p><strong>Shortcode:</strong> <code>[kbbco_games]</code></p>
+        <p><strong>API Endpoint:</strong> VBL Basketball League API</p>
+        
+        <h3>Test Controls</h3>
+        <button onclick="showLoading()" style="margin: 5px; padding: 8px 16px;">Show Loading State</button>
+        <button onclick="showError()" style="margin: 5px; padding: 8px 16px;">Show Error State</button>
+        <button onclick="showGames()" style="margin: 5px; padding: 8px 16px;">Show Games</button>
+        <button onclick="toggleNoGames()" style="margin: 5px; padding: 8px 16px;">Toggle No Games</button>
+        
+        <h3>Features Demonstrated</h3>
+        <ul>
+            <li>✅ Responsive card-based layout</li>
+            <li>✅ Color-coded team levels</li>
+            <li>✅ Home/away game distinction</li>
+            <li>✅ Score display for completed games</li>
+            <li>✅ Cup game badges</li>
+            <li>✅ Multiple games at same time</li>
+            <li>✅ Loading and error states</li>
+            <li>✅ Navigation controls</li>
+            <li>✅ Mobile responsive design</li>
+        </ul>
+    </div>
+
+    <script>
+        // Test functions for demonstration
+        function testNav(direction) {
+            const title = document.getElementById('week-title');
+            if (direction === 'next') {
+                title.textContent = 'Van maandag 23 tem zondag 29 augustus';
+                console.log('Next week clicked');
+            } else {
+                title.textContent = 'Van maandag 9 tem zondag 15 augustus';
+                console.log('Previous week clicked');
+            }
+        }
+
+        function showLoading() {
+            const content = document.getElementById('games-content');
+            content.innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Wedstrijden laden...</p>
+                </div>
+            `;
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function showError() {
+            const content = document.getElementById('games-content');
+            content.innerHTML = '';
+            document.getElementById('error-message').style.display = 'block';
+        }
+
+        function showGames() {
+            location.reload(); // Reset to original state
+        }
+
+        function toggleNoGames() {
+            const content = document.getElementById('games-content');
+            content.innerHTML = `
+                <div class="week-games active">
+                    <div class="no-games-message">
+                        <h3>Geen wedstrijden deze week</h3>
+                        <p>Er zijn geen wedstrijden gepland voor deze week.</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function testReload() {
+            showLoading();
+            setTimeout(showGames, 2000);
+        }
+
+        // Test mobile responsive behavior
+        console.log('KBBCO Games Plugin - Test Page Loaded');
+        console.log('Screen width:', window.innerWidth);
+        console.log('User agent:', navigator.userAgent);
+    </script>
+</body>
+</html>
