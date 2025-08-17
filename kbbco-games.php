@@ -3,7 +3,7 @@
  * Plugin Name: KBBCO Basketball Games
  * Plugin URI: https://kbbco.be
  * Description: Display basketball games and scores for KBBCO teams with a modern, responsive interface
- * Version: 2.0.0
+ * Version: 2.1.0
  * Author: Stephan Janssen
  * License: GPL v2 or later
  * Text Domain: kbbco-games
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 class KBBCOGamesPlugin {
     
     private $api_url = 'https://vblcb.wisseq.eu/VBLCB_WebService/data/OrgMatchesByGuid?issguid=BVBL1075';
-    private $version = '2.0.0';
+    private $version = '2.1.0';
     
     public function __construct() {
         add_action('init', array($this, 'init'));

@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./build.sh:*)"
+      "Bash(./build.sh:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run build:dev:*)",
+      "Bash(open /Users/stephan/phpStorm/kbbco-games-wordpress/test-week-calculation.html)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

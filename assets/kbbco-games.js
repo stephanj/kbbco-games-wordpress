@@ -37,9 +37,18 @@ class KBBCOGames {
     
     getCurrentWeek() {
         const now = new Date();
-        const startOfYear = new Date(now.getFullYear(), 0, 1);
-        const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
-        return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+        
+        // Get ISO week number (Monday-based weeks)
+        // This algorithm follows ISO 8601 standard
+        const thursday = new Date(now.getTime());
+        thursday.setDate(now.getDate() - ((now.getDay() + 6) % 7) + 3);
+        
+        const firstThursday = new Date(thursday.getFullYear(), 0, 4);
+        firstThursday.setDate(firstThursday.getDate() - ((firstThursday.getDay() + 6) % 7) + 3);
+        
+        const weekNumber = Math.floor((thursday.getTime() - firstThursday.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1;
+        
+        return weekNumber;
     }
     
     loadGames() {
@@ -431,15 +440,25 @@ class KBBCOGames {
                 return;
             }
             
-            const startDate = this.getDateOfWeek(this.displayWeek, new Date().getFullYear());
+            // Get the Monday of the selected week
+            const currentYear = new Date().getFullYear();
+            const startDate = this.getDateOfWeek(this.displayWeek, currentYear);
+            
+            // Calculate Sunday (6 days after Monday)
             const endDate = new Date(startDate);
             endDate.setDate(endDate.getDate() + 6);
             
+            // Format the title
             let content = `Van maandag ${startDate.getDate()} `;
             if (startDate.getMonth() !== endDate.getMonth()) {
                 content += this.monthNames[startDate.getMonth()];
             }
             content += ` tem zondag ${endDate.getDate()} ${this.monthNames[endDate.getMonth()]}`;
+            
+            // Handle year changes (if week spans into next year)
+            if (startDate.getFullYear() !== endDate.getFullYear()) {
+                content = `Van maandag ${startDate.getDate()} ${this.monthNames[startDate.getMonth()]} ${startDate.getFullYear()} tem zondag ${endDate.getDate()} ${this.monthNames[endDate.getMonth()]} ${endDate.getFullYear()}`;
+            }
             
             titleElement.textContent = content;
         } catch (error) {
@@ -449,15 +468,22 @@ class KBBCOGames {
     }
     
     getDateOfWeek(week, year) {
-        const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
-        const dow = simple.getUTCDay();
-        const ISOweekStart = simple;
-        if (dow <= 4) {
-            ISOweekStart.setUTCDate(simple.getUTCDate() - simple.getUTCDay() + 1);
-        } else {
-            ISOweekStart.setUTCDate(simple.getUTCDate() + 8 - simple.getUTCDay());
-        }
-        return ISOweekStart;
+        // Calculate the Monday of the given ISO week number
+        // ISO weeks start on Monday and week 1 contains the first Thursday of the year
+        
+        // Find the first Thursday of the year
+        const firstThursday = new Date(year, 0, 4);
+        firstThursday.setDate(firstThursday.getDate() - ((firstThursday.getDay() + 6) % 7) + 3);
+        
+        // Calculate the Monday of week 1 (3 days before the first Thursday)
+        const mondayOfWeek1 = new Date(firstThursday.getTime());
+        mondayOfWeek1.setDate(firstThursday.getDate() - 3);
+        
+        // Add (week - 1) * 7 days to get the Monday of the requested week
+        const mondayOfRequestedWeek = new Date(mondayOfWeek1.getTime());
+        mondayOfRequestedWeek.setDate(mondayOfWeek1.getDate() + (week - 1) * 7);
+        
+        return mondayOfRequestedWeek;
     }
     
     // Utility function to escape HTML
